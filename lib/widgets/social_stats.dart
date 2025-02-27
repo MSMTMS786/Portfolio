@@ -26,7 +26,6 @@ class SocialStats extends StatelessWidget {
         return FontAwesomeIcons.facebookF;
       case 'github':
         return FontAwesomeIcons.github;
-      
       case 'linkedin':
         return FontAwesomeIcons.linkedinIn;
       case 'contact':
@@ -53,7 +52,19 @@ class SocialStats extends StatelessWidget {
 
   Future<void> _launchUrl(String platform) async {
     debugPrint("Attempting to launch platform: $platform");
-    final url = profileUrls[platform];
+    
+    // Convert to lowercase to ensure case-insensitive matching
+    final platformLower = platform.toLowerCase();
+    String? url;
+    
+    // Find the URL in profileUrls (case-insensitive)
+    for (var entry in profileUrls.entries) {
+      if (entry.key.toLowerCase() == platformLower) {
+        url = entry.value;
+        break;
+      }
+    }
+    
     debugPrint("URL for platform: $url");
     
     if (url == null || url.isEmpty) {
@@ -66,8 +77,8 @@ class SocialStats extends StatelessWidget {
       debugPrint("Launching URL: $uri");
       
       if (await canLaunchUrl(uri)) {
-        final result = await launchUrl(uri, mode: LaunchMode.externalApplication);
-        debugPrint("Launch result: $result");
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        debugPrint("URL launched successfully");
       } else {
         debugPrint('Cannot launch URL: $url');
       }

@@ -37,6 +37,7 @@ dependencies:
   cached_network_image: ^3.3.0  # For image handling
   font_awesome_flutter: ^10.5.0  # For social media icons
   url_launcher: ^6.1.12 # For launching URLs
+  get: ^4.7.2
 
 dev_dependencies:
   flutter_test:

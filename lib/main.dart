@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 import 'screens/profile_screen.dart';
 
+
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Profile App',
+    return GetMaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.blue,
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF1E1E2E),
+        // primaryColor: Colors.,
+        
       ),
-      home: const ProfileScreen(),
       debugShowCheckedModeBanner: false,
+      title: "Portfolio App",
+      
+      home: ProfileScreen(),
     );
   }
 }

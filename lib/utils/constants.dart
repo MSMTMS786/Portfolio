@@ -15,7 +15,7 @@ final User sampleUser = User(
   },
    profileUrls: {
     'facebook': 'https://www.facebook.com/misbahrehmansukhera.sukhera.9',
-    'github': 'https://github.com/',
+    'github': 'https://github.com/MSMTMS786',
     'linkedin': 'https://www.linkedin.com/in/misbah-ur-rehman-580941274/',
     'Contact': 'tel:+923036887374',  // Use tel: protocol for phone calls
   },
@@ -31,6 +31,12 @@ final List<MediaItem> sampleMediaItems = [
 ];
 
 // Colors
-const Color primaryColor = Color(0xFF1E1E2E);
-const Color accentColor = Color(0xFFFFA726);
-const Color cardColor = Color(0xFF2A2A3A);
+
+
+class AppColors {
+  static const Color primary = Color.fromARGB(255, 32, 117, 193); // Change to your main color
+  static const Color secondary = Color.fromARGB(255, 158, 127, 33); // Change to your secondary color
+  static const Color accent = Color.fromARGB(255, 21, 201, 27); // Change to your accent color
+}
+ 
+

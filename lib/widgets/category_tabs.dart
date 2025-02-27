@@ -13,6 +13,8 @@ class CategoryTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categories = ['All', 'Photos', 'Music', 'Videos'];
+    final darkbrightness=Theme.of(context).brightness == Brightness.dark;
+    
 
     return Container(
       height: 40,
@@ -27,7 +29,9 @@ class CategoryTabs extends StatelessWidget {
                 Text(
                   category,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.grey,
+                    color: darkbrightness
+                        ? (isSelected ? Colors.blue :  Colors.white)
+                        : (isSelected ? Colors.blue : Colors.black),
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
