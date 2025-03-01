@@ -1,4 +1,3 @@
-// lib/widgets/social_stats.dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -6,11 +5,13 @@ import 'package:url_launcher/url_launcher.dart';
 class SocialStats extends StatelessWidget {
   final Map<String, int> stats;
   final Map<String, String> profileUrls;
+  final String whatsappNumber; // Add WhatsApp number here
 
   const SocialStats({
     super.key,
     required this.stats,
     required this.profileUrls,
+    required this.whatsappNumber, // Require WhatsApp number
   });
 
   String _formatNumber(int number) {
@@ -28,10 +29,10 @@ class SocialStats extends StatelessWidget {
         return FontAwesomeIcons.github;
       case 'linkedin':
         return FontAwesomeIcons.linkedinIn;
-      case 'contact':
-        return FontAwesomeIcons.phone;
+      case 'WhatsApp': // Change contact icon to WhatsApp
+        return FontAwesomeIcons.whatsapp;
       default:
-        return FontAwesomeIcons.star;
+        return FontAwesomeIcons.whatsapp;
     }
   }
 
@@ -43,39 +44,49 @@ class SocialStats extends StatelessWidget {
         return Colors.white;
       case 'linkedin':
         return Colors.blue.shade700;
-      case 'contact':
+      case 'WhatsApp': // Change contact color to WhatsApp green
         return Colors.green;
       default:
-        return Colors.grey;
+        return Colors.green;
     }
   }
 
   Future<void> _launchUrl(String platform) async {
     debugPrint("Attempting to launch platform: $platform");
-    
-    // Convert to lowercase to ensure case-insensitive matching
     final platformLower = platform.toLowerCase();
+
+    if (platformLower == 'WhatsApp') {
+      // Handle WhatsApp separately
+      String whatsappUrl = "https://wa.me/$whatsappNumber?text=${Uri.encodeComponent('Hey')}";
+      debugPrint("Launching WhatsApp: $whatsappUrl");
+
+      if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
+        await launchUrl(Uri.parse(whatsappUrl), mode: LaunchMode.externalApplication);
+      } else {
+        debugPrint('Cannot launch WhatsApp chat.');
+      }
+      return;
+    }
+
+    // Handle other platforms
     String? url;
-    
-    // Find the URL in profileUrls (case-insensitive)
     for (var entry in profileUrls.entries) {
       if (entry.key.toLowerCase() == platformLower) {
         url = entry.value;
         break;
       }
     }
-    
+
     debugPrint("URL for platform: $url");
-    
     if (url == null || url.isEmpty) {
       debugPrint("No URL found for platform: $platform");
       return;
     }
-    
+
     try {
       final uri = Uri.parse(url);
       debugPrint("Launching URL: $uri");
-      
+
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
         debugPrint("URL launched successfully");

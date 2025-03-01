@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 import '../models/media_item.dart';
 
 class MediaGrid extends StatelessWidget {
@@ -37,14 +38,93 @@ class MediaGrid extends StatelessWidget {
         ),
         itemCount: filteredItems.length,
         itemBuilder: (context, index) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
-              filteredItems[index].imageUrl,
-              fit: BoxFit.cover,
-            ),
-          );
+          final item = filteredItems[index];
+
+          if (item.type == 'photo') {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.asset(
+                item.imageUrl,
+                fit: BoxFit.cover,
+              ),
+            );
+          } else if (item.type == 'video') {
+            return VideoItem(videoUrl: item.imageUrl);
+          } else if (item.type == 'music') {
+            return MusicItem(musicUrl: item.imageUrl);
+          } else {
+            return Container();
+          }
         },
+      ),
+    );
+  }
+}
+
+class VideoItem extends StatefulWidget {
+  final String videoUrl;
+  const VideoItem({Key? key, required this.videoUrl}) : super(key: key);
+
+  @override
+  _VideoItemState createState() => _VideoItemState();
+}
+
+class _VideoItemState extends State<VideoItem> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.asset(widget.videoUrl)
+      ..initialize().then((_) {
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: VideoPlayer(_controller),
+          ),
+        ),
+        IconButton(
+          icon: Icon(_controller.value.isPlaying ? Icons.pause : Icons.play_arrow, color: Colors.white, size: 40),
+          onPressed: () {
+            setState(() {
+              _controller.value.isPlaying ? _controller.pause() : _controller.play();
+            });
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class MusicItem extends StatelessWidget {
+  final String musicUrl;
+  const MusicItem({Key? key, required this.musicUrl}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.blueAccent.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(
+        child: Icon(Icons.music_note, color: Colors.blue, size: 40),
       ),
     );
   }

@@ -81,7 +81,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               
               
-              _drawerItem(icon: Icons.home, text: 'Home', page: ProfileScreen()),
+              // _drawerItem(
+              //   icon: Icons.home,
+              //   text: 'Home', 
+              //   page: ProfileScreen()
+              //   ),
               _drawerItem(
                 icon: Icons.person,
                 text: 'About Me',
@@ -138,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 16),
                       SocialStats(
                         stats: sampleUser.socialStats,
-                        profileUrls: sampleUser.profileUrls,
+                        profileUrls: sampleUser.profileUrls, whatsappNumber: '03036887374',
                       ),
                       const SizedBox(height: 16),
                     ],
