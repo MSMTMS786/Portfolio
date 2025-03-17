@@ -25,10 +25,13 @@ class CategoryTabs extends StatelessWidget {
           return GestureDetector(
             onTap: () => onCategorySelected(category),
             child: Column(
+
               children: [
+                SizedBox(height: 14),
                 Text(
                   category,
                   style: TextStyle(
+
                     color: darkbrightness
                         ? (isSelected ? Colors.blue :  Colors.white)
                         : (isSelected ? Colors.blue : Colors.black),

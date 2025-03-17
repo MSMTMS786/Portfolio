@@ -16,9 +16,12 @@ class MediaGrid extends StatelessWidget {
     if (category == 'All') {
       return mediaItems;
     }
-    return mediaItems
-        .where((item) => item.type.toLowerCase() == category.toLowerCase())
-        .toList();
+    return mediaItems.where((item) {
+      if (category == 'Photos' && item.type.toLowerCase() == 'photo') return true;
+      if (category == 'Videos' && item.type.toLowerCase() == 'video') return true;
+      if (category == 'Music' && item.type.toLowerCase() == 'music') return true;
+      return false;
+    }).toList();
   }
 
   @override
@@ -40,45 +43,100 @@ class MediaGrid extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = filteredItems[index];
 
-          if (item.type == 'photo') {
-            return ClipRRect(
+          return GestureDetector(
+            onTap: () {
+              if (item.type.toLowerCase() == 'photo') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FullScreenImage(imageUrl: item.imageUrl)),
+                );
+              } else if (item.type.toLowerCase() == 'video') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FullScreenVideo(videoUrl: item.imageUrl)),
+                );
+              } else if (item.type.toLowerCase() == 'music') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FullScreenMusic(musicUrl: item.imageUrl)),
+                );
+              }
+            },
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                item.imageUrl,
-                fit: BoxFit.cover,
-              ),
-            );
-          } else if (item.type == 'video') {
-            return VideoItem(videoUrl: item.imageUrl);
-          } else if (item.type == 'music') {
-            return MusicItem(musicUrl: item.imageUrl);
-          } else {
-            return Container();
-          }
+              child: item.type.toLowerCase() == 'photo'
+                  ? Image.asset(
+                      item.imageUrl,
+                      fit: BoxFit.cover,
+                    )
+                  : item.type.toLowerCase() == 'video'
+                      ? Container(
+                          color: Colors.black,
+                          child: const Center(
+                            child: Icon(Icons.play_circle_fill, color: Colors.white, size: 50),
+                          ),
+                        )
+                      : Container(
+                          color: Colors.blueAccent.withOpacity(0.1),
+                          child: const Center(
+                            child: Icon(Icons.music_note, color: Colors.blue, size: 40),
+                          ),
+                        ),
+            ),
+          );
         },
       ),
     );
   }
 }
 
-class VideoItem extends StatefulWidget {
-  final String videoUrl;
-  const VideoItem({Key? key, required this.videoUrl}) : super(key: key);
+// Full-Screen Image Viewer
+class FullScreenImage extends StatelessWidget {
+  final String imageUrl;
+  const FullScreenImage({Key? key, required this.imageUrl}) : super(key: key);
 
   @override
-  _VideoItemState createState() => _VideoItemState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(backgroundColor: Colors.black),
+      body: Center(
+        child: Image.asset(imageUrl, fit: BoxFit.contain),
+      ),
+    );
+  }
 }
 
-class _VideoItemState extends State<VideoItem> {
+class FullScreenVideo extends StatefulWidget {
+  final String videoUrl;
+  const FullScreenVideo({Key? key, required this.videoUrl}) : super(key: key);
+
+  @override
+  _FullScreenVideoState createState() => _FullScreenVideoState();
+}
+
+class _FullScreenVideoState extends State<FullScreenVideo> {
   late VideoPlayerController _controller;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset(widget.videoUrl)
-      ..initialize().then((_) {
-        setState(() {});
+    _initializeVideo();
+  }
+
+  void _initializeVideo() async {
+    try {
+      _controller = VideoPlayerController.asset(widget.videoUrl);
+      await _controller.initialize();
+      setState(() {
+        _isLoading = false;
       });
+      _controller.play();
+      _controller.setLooping(true);
+    } catch (e) {
+      print("Video Player Error: $e");
+    }
   }
 
   @override
@@ -89,43 +147,68 @@ class _VideoItemState extends State<VideoItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          ),
-        ),
-        IconButton(
-          icon: Icon(_controller.value.isPlaying ? Icons.pause : Icons.play_arrow, color: Colors.white, size: 40),
-          onPressed: () {
-            setState(() {
-              _controller.value.isPlaying ? _controller.pause() : _controller.play();
-            });
-          },
-        ),
-      ],
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(backgroundColor: Colors.black),
+      body: Center(
+        child: _isLoading
+            ? CircularProgressIndicator(color: Colors.white)
+            : Stack(
+                alignment: Alignment.center,
+                children: [
+                  AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: VideoPlayer(_controller),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                      color: Colors.white,
+                      size: 50,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _controller.value.isPlaying ? _controller.pause() : _controller.play();
+                      });
+                    },
+                  ),
+                ],
+              ),
+      ),
     );
   }
 }
-
-class MusicItem extends StatelessWidget {
+class FullScreenMusic extends StatelessWidget {
   final String musicUrl;
-  const MusicItem({Key? key, required this.musicUrl}) : super(key: key);
+
+  const FullScreenMusic({Key? key, required this.musicUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.blueAccent.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Center(
-        child: Icon(Icons.music_note, color: Colors.blue, size: 40),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(backgroundColor: Colors.black),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.music_note, color: Colors.white, size: 100),
+            SizedBox(height: 20),
+            Text(
+              "Playing Music...",
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Close"),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
